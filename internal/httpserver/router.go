@@ -6,10 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
+	"go-base/internal/auth"
 	"go-base/internal/cache"
 	"go-base/internal/config"
 	"go-base/internal/database"
 	"go-base/internal/httpserver/middleware"
+	"go-base/internal/httpserver/modules"
 	"go-base/internal/logger"
 	"go-base/internal/mq"
 	"go-base/internal/security"
@@ -61,16 +63,28 @@ func BuildRouter(cfg RouterConfig) *gin.Engine {
 	userRepo := user.NewRepository(cfg.DB.DB())
 	userService := user.NewService(userRepo, cfg.Cache, cfg.Config.Redis.TTL)
 
-	authModule := buildAuthModule(buildAuthModuleConfig{
+	apiGroup := r.Group("/api/v1")
+
+	authModule := auth.BuildModule(auth.ModuleConfig{
 		Config:    cfg.Config,
-		Router:    r.Group("/api/v1"),
+		Router:    apiGroup,
 		Validator: cfg.Validator,
 		Password:  cfg.Password,
 		JWT:       cfg.JWTManager,
 		Users:     userService,
 		MQ:        cfg.MQ,
 	})
-	authModule.registerRoutes()
+	authModule.RegisterRoutes()
+
+	modules.InstallAll(apiGroup, modules.Dependencies{
+		Config:    cfg.Config,
+		Logger:    log,
+		DB:        cfg.DB,
+		Cache:     cfg.Cache,
+		MQ:        cfg.MQ,
+		Validator: cfg.Validator,
+		JWT:       cfg.JWTManager,
+	})
 
 	return r
 }

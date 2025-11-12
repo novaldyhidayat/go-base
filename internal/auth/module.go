@@ -10,7 +10,7 @@ import (
 	"go-base/internal/validation"
 )
 
-type buildAuthModuleConfig struct {
+type ModuleConfig struct {
 	Config    *config.Config
 	Router    *gin.RouterGroup
 	Validator validation.Validator
@@ -20,12 +20,12 @@ type buildAuthModuleConfig struct {
 	MQ        mq.Client
 }
 
-type module struct {
+type Module struct {
 	controller *Controller
 	router     *gin.RouterGroup
 }
 
-func buildAuthModule(cfg buildAuthModuleConfig) *module {
+func BuildModule(cfg ModuleConfig) *Module {
 	service := NewService(
 		cfg.Users,
 		func(i interface{}) error { return cfg.Validator.Struct(i) },
@@ -36,13 +36,13 @@ func buildAuthModule(cfg buildAuthModuleConfig) *module {
 
 	controller := NewController(service)
 
-	return &module{
+	return &Module{
 		controller: controller,
 		router:     cfg.Router,
 	}
 }
 
-func (m *module) registerRoutes() {
+func (m *Module) RegisterRoutes() {
 	r := m.router.Group("/auth")
 	r.POST("/register", m.controller.Register)
 	r.POST("/login", m.controller.Login)

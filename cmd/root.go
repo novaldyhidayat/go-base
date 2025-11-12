@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"go-base/internal/app"
 	"go-base/internal/config"
 	"go-base/internal/logger"
 )

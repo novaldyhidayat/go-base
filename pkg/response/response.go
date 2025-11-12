@@ -23,10 +23,10 @@ func JSON(data interface{}, meta interface{}) Envelope {
 
 // Fail wraps error responses.
 func Fail(code string, message string, details interface{}) (int, Envelope) {
-	return Error(http.StatusBadRequest, code, message, details)
+	return WithStatus(http.StatusBadRequest, code, message, details)
 }
 
-// Error builds an error envelope with custom HTTP status.
-func Error(status int, code string, message string, details interface{}) (int, Envelope) {
+// WithStatus builds an error envelope with custom HTTP status.
+func WithStatus(status int, code string, message string, details interface{}) (int, Envelope) {
 	return status, Envelope{Error: &Error{Code: code, Message: message, Details: details}}
 }
