@@ -3,7 +3,7 @@ package migrations
 import (
 	"gorm.io/gorm"
 
-	"go-base/internal/user"
+	"go-base/internal/modules/user"
 )
 
 // AutoMigrate runs schema migrations for domain models.

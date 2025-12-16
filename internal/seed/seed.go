@@ -10,8 +10,8 @@ import (
 	"go-base/internal/config"
 	"go-base/internal/database"
 	"go-base/internal/logger"
+	"go-base/internal/modules/user"
 	"go-base/internal/security"
-	"go-base/internal/user"
 )
 
 // Run executes database seeders based on configuration.

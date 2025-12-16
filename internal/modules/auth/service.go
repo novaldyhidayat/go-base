@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
+	"go-base/internal/modules/user"
 	"go-base/internal/mq"
 	"go-base/internal/security"
-	"go-base/internal/user"
 )
 
 // Service handles authentication and related workflows.

@@ -6,16 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"go-base/internal/auth"
 	"go-base/internal/cache"
 	"go-base/internal/config"
 	"go-base/internal/database"
 	"go-base/internal/httpserver/middleware"
 	"go-base/internal/httpserver/modules"
 	"go-base/internal/logger"
+	"go-base/internal/modules/auth"
+	"go-base/internal/modules/user"
 	"go-base/internal/mq"
 	"go-base/internal/security"
-	"go-base/internal/user"
 	"go-base/internal/validation"
 	"go-base/pkg/response"
 )

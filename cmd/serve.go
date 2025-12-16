@@ -10,7 +10,7 @@ import (
 
 	"go-base/internal/app"
 	"go-base/internal/httpserver"
-	"go-base/internal/user"
+	"go-base/internal/modules/user"
 )
 
 var serveCmd = &cobra.Command{

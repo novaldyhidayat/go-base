@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"go-base/internal/config"
+	"go-base/internal/modules/user"
 	"go-base/internal/mq"
 	"go-base/internal/security"
-	"go-base/internal/user"
 	"go-base/internal/validation"
 )
 
