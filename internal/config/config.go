@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -99,6 +100,8 @@ type SecurityConfig struct {
 func Load(path string) (*Config, error) {
 	v := viper.New()
 	v.SetConfigFile(path)
+	v.SetEnvPrefix("GOBASE")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	v.SetDefault("app.name", "go-base")
 	v.SetDefault("app.env", "development")
@@ -111,10 +114,29 @@ func Load(path string) (*Config, error) {
 	v.SetDefault("logging.level", "info")
 	v.SetDefault("logging.mode", "production")
 	v.SetDefault("seed.enabled", false)
-	v.SetDefault("seed.admin_email", "admin@example.com")
-	v.SetDefault("seed.admin_password", "ChangeMe123!")
+	v.SetDefault("seed.admin_email", "")
+	v.SetDefault("seed.admin_password", "")
 
 	v.AutomaticEnv()
+	for _, key := range []string{
+		"app.name", "app.description", "app.env", "app.version",
+		"server.host", "server.port", "server.read_timeout", "server.write_timeout",
+		"server.idle_timeout", "server.graceful_timeout",
+		"database.dsn", "database.max_idle_conns", "database.max_open_conns",
+		"database.conn_max_lifetime", "database.auto_migrate",
+		"redis.addr", "redis.password", "redis.db", "redis.ttl",
+		"rabbitmq.uri", "rabbitmq.exchange", "rabbitmq.exchange_type", "rabbitmq.queue",
+		"rabbitmq.routing_key", "rabbitmq.durable",
+		"jwt.private_key_path", "jwt.public_key_path", "jwt.issuer", "jwt.audience",
+		"jwt.expires_in", "jwt.refresh_ttl",
+		"logging.level", "logging.mode", "seed.enabled", "seed.admin_email",
+		"seed.admin_password", "security.allowed_origins", "security.allowed_methods",
+		"security.allowed_headers",
+	} {
+		if err := v.BindEnv(key); err != nil {
+			return nil, fmt.Errorf("bind environment variable for %s: %w", key, err)
+		}
+	}
 
 	if err := v.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("read config: %w", err)

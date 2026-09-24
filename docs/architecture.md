@@ -8,8 +8,8 @@ cmd/
   serve.go
   migrate.go
   seed.go
-  generate/
-    crud.go
+  generate.go
+  generate_crud.go
 configs/
   config.yaml
 internal/
@@ -17,12 +17,12 @@ internal/
     application.go
     buildinfo/
       buildinfo.go
-  auth/
-    controller.go
-    repository.go
-    service.go
-    transport.go
-    dto.go
+  modules/
+    auth/
+      controller.go
+      dto.go
+      module.go
+      service.go
   cache/
     redis.go
   database/
@@ -42,20 +42,16 @@ internal/
     jwt.go
     password.go
   seed/
-    user_seed.go
-  user/
+    seed.go
+  modules/user/
     model.go
     repository.go
     service.go
-    validation.go
   validation/
     validator.go
 pkg/
   response/
-    error.go
     response.go
-  util/
-    time.go
 ```
 
 ## Layers
@@ -69,7 +65,7 @@ pkg/
 ## Configuration & Environment
 
 - Configuration files are stored under `configs/` and read via Viper. Environment variables override file values using the `GOBASE_` prefix.
-- RSA keys for JWT signing are kept in `configs/keys/` (development keys provided with instructions to replace in production).
+- RSA keys for JWT signing are referenced from `configs/config.yaml`; keep private keys out of version control and replace development keys in production.
 - Build metadata (version, commit) is injected via linker flags and exposed through `internal/app/buildinfo`.
 
 ## Commands

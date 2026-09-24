@@ -46,7 +46,7 @@ logging:
   mode: development
 
 seed:
-  enabled: true
+  enabled: false
 
 security:
   allowed_origins:

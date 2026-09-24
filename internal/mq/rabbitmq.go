@@ -109,8 +109,14 @@ func (r *rabbitClient) Subscribe(queue string, handler func(amqp.Delivery)) erro
 }
 
 func (r *rabbitClient) Close() error {
-	if err := r.channel.Close(); err != nil {
-		return err
+	var closeErr error
+	if r.channel != nil {
+		closeErr = r.channel.Close()
 	}
-	return r.conn.Close()
+	if r.conn != nil {
+		if err := r.conn.Close(); err != nil && closeErr == nil {
+			closeErr = err
+		}
+	}
+	return closeErr
 }

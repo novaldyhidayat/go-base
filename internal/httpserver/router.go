@@ -47,7 +47,6 @@ func BuildRouter(cfg RouterConfig) *gin.Engine {
 		log = logger.L()
 	}
 
-	r.Use(gin.Recovery())
 	r.Use(middleware.RequestID())
 	r.Use(middleware.Logger(log))
 	r.Use(middleware.Recovery(log))

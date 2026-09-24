@@ -34,6 +34,7 @@ func NewRedis(cfg config.RedisConfig) (Cache, error) {
 	defer cancel()
 
 	if err := client.Ping(ctx).Err(); err != nil {
+		_ = client.Close()
 		return nil, err
 	}
 

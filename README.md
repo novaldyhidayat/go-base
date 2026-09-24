@@ -4,7 +4,7 @@ Production-ready Go service starter kit with authentication, JWT (RS256), Redis 
 
 ## Prerequisites
 
-- Go 1.22+
+- Go 1.27+
 - PostgreSQL 14+
 - Redis 6+
 - RabbitMQ 3.12+
@@ -18,7 +18,7 @@ All configuration lives in `configs/config.yaml` and can be overridden via envir
 - `redis.*` – Redis host, password, DB, and default TTL.
 - `rabbitmq.*` – Broker URI, exchange, queue, routing key.
 - `jwt.*` – Paths to RSA keys and token metadata.
-- `seed.*` – Enables initial admin seed data.
+- `seed.*` – Enables initial admin seed data. Seeding is disabled by default; provide explicit credentials when enabling it.
 
 Example DSN for a local Dockerized Postgres instance:
 
@@ -33,6 +33,7 @@ Ensure the referenced database, user, and password exist before starting the app
 Commands are registered through Cobra in `cmd/root.go`; subcommands are defined under `cmd/`. Currently available commands:
 
 - `serve` – Runs the HTTP API server.
+- `migrate` – Applies the registered GORM migrations.
 - `seed` – Seeds initial data (admin user) when enabled in config.
 - `generate crud` – Produces DTOs, validation-ready requests, repositories, services, controllers, and JWT-protected routes from an existing GORM model.
 
@@ -62,7 +63,7 @@ Add `bin/` to your PATH or install globally with `go install ./...` to expose `g
    ```
 2. **Redis**: ensure Redis is running and reachable at the configured address.
 3. **RabbitMQ**: ensure the configured exchange/queue exist or allow auto-declare with provided credentials.
-4. **JWT keys**: place RSA private/public keys under `configs/keys/` or update config paths accordingly.
+4. **JWT keys**: place RSA keys at the configured paths and keep private keys out of version control.
 5. **Seed admin** (optional): toggle `seed.enabled` and set `seed.admin_email` / `seed.admin_password`.
 
 ## Database Schema
@@ -147,4 +148,4 @@ See `docs/architecture.md` for a detailed layout of packages and responsibilitie
 
 - Run `go fmt ./...` and `go test ./...` regularly.
 - Configure environment variables for local overrides (e.g., `GOBASE_DATABASE_DSN`).
-- Use Docker Compose to spin up Postgres, Redis, and RabbitMQ for local development (not included yet).
+- Use local Postgres, Redis, and RabbitMQ services for development; container orchestration files are not included.

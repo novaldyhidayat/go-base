@@ -32,6 +32,13 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("load config: %w", err)
 		}
+		if cmd.Flags().Changed("env") {
+			env, err := cmd.Flags().GetString("env")
+			if err != nil {
+				return fmt.Errorf("read environment flag: %w", err)
+			}
+			c.App.Env = env
+		}
 
 		logger.SetGlobalLogger(c.Logging)
 

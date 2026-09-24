@@ -87,16 +87,26 @@ func New(ctx context.Context, cfg *config.Config) (*Application, error) {
 
 // Close releases connections.
 func (a *Application) Close(ctx context.Context) error {
-	if err := a.MQ.Close(); err != nil {
-		logger.L().Warn("failed to close rabbitmq", zap.Error(err))
+	if a == nil {
+		return nil
 	}
 
-	if err := a.Cache.Close(); err != nil {
-		logger.L().Warn("failed to close redis", zap.Error(err))
+	if a.MQ != nil {
+		if err := a.MQ.Close(); err != nil {
+			logger.L().Warn("failed to close rabbitmq", zap.Error(err))
+		}
 	}
 
-	if err := a.DB.Close(); err != nil {
-		logger.L().Warn("failed to close database", zap.Error(err))
+	if a.Cache != nil {
+		if err := a.Cache.Close(); err != nil {
+			logger.L().Warn("failed to close redis", zap.Error(err))
+		}
+	}
+
+	if a.DB != nil {
+		if err := a.DB.Close(); err != nil {
+			logger.L().Warn("failed to close database", zap.Error(err))
+		}
 	}
 
 	return nil

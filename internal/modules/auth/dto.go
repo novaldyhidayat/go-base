@@ -2,10 +2,9 @@ package auth
 
 // RegisterRequest represents the payload to register a new user.
 type RegisterRequest struct {
-	Email    string   `json:"email" validate:"required,email"`
-	Password string   `json:"password" validate:"required,min=8"`
-	FullName string   `json:"full_name" validate:"required"`
-	Roles    []string `json:"roles" validate:"omitempty,dive,alphanum"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8"`
+	FullName string `json:"full_name" validate:"required"`
 }
 
 // LoginRequest represents user login credentials.

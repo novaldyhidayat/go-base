@@ -20,6 +20,9 @@ type Server struct {
 
 // NewServer constructs a Server.
 func NewServer(engine *gin.Engine, cfg config.ServerConfig, log *zap.Logger) *Server {
+	if log == nil {
+		log = zap.NewNop()
+	}
 	return &Server{engine: engine, cfg: cfg, log: log}
 }
 

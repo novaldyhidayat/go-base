@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"go-base/internal/app"
+	"go-base/internal/database/migrations"
 	"go-base/internal/httpserver"
-	"go-base/internal/modules/user"
 )
 
 var serveCmd = &cobra.Command{
@@ -28,7 +28,7 @@ var serveCmd = &cobra.Command{
 		defer application.Close(context.Background())
 
 		if cfg.Database.AutoMigrate {
-			if err := application.DB.DB().AutoMigrate(&user.User{}); err != nil {
+			if err := migrations.AutoMigrate(application.DB.DB()); err != nil {
 				return err
 			}
 		}

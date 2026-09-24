@@ -29,7 +29,7 @@ func (c *Controller) Register(ctx *gin.Context) {
 
 	user, err := c.service.Register(ctx.Request.Context(), req)
 	if err != nil {
-		status, payload := response.Fail("register_failed", "Could not register user", err.Error())
+		status, payload := response.Fail("register_failed", "Could not register user", nil)
 		ctx.JSON(status, payload)
 		return
 	}
@@ -48,7 +48,7 @@ func (c *Controller) Login(ctx *gin.Context) {
 
 	token, err := c.service.Login(ctx.Request.Context(), req)
 	if err != nil {
-		status, payload := response.Fail("login_failed", "Invalid email or password", err.Error())
+		status, payload := response.Fail("login_failed", "Invalid email or password", nil)
 		ctx.JSON(status, payload)
 		return
 	}

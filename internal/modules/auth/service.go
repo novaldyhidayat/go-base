@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"go-base/internal/modules/user"
 	"go-base/internal/mq"
@@ -47,10 +48,10 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (*user.User
 	}
 
 	newUser := &user.User{
-		Email:    req.Email,
+		Email:    normalizeEmail(req.Email),
 		Password: hash,
 		FullName: req.FullName,
-		Roles:    req.Roles,
+		Roles:    []string{"user"},
 	}
 
 	if err := s.users.Create(ctx, newUser); err != nil {
@@ -79,7 +80,7 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (string, error) {
 		return "", fmt.Errorf("validate request: %w", err)
 	}
 
-	u, err := s.users.FindByEmail(ctx, req.Email)
+	u, err := s.users.FindByEmail(ctx, normalizeEmail(req.Email))
 	if err != nil {
 		if errors.Is(err, user.ErrNotFound) {
 			return "", errors.New("invalid credentials")
@@ -97,4 +98,8 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (string, error) {
 	}
 
 	return token, nil
+}
+
+func normalizeEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
 }

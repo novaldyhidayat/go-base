@@ -30,7 +30,7 @@ func Auth(jwtManager security.JWTManager) gin.HandlerFunc {
 
 		claims, err := jwtManager.Verify(parts[1])
 		if err != nil {
-			status, payload := response.Fail("unauthorized", "Invalid or expired token", err.Error())
+			status, payload := response.Fail("unauthorized", "Invalid or expired token", nil)
 			c.AbortWithStatusJSON(status, payload)
 			return
 		}

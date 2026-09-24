@@ -117,10 +117,13 @@ func Generate(opts Options) error {
 		fmt.Sprintf("%s_module_gen.go", entitySnake):     moduleTemplate,
 	}
 
+	rendered := make(map[string][]byte, len(files))
 	for filename, tmpl := range files {
 		destPath := filepath.Join(outputDir, filename)
 		if _, err := os.Stat(destPath); err == nil {
 			return fmt.Errorf("file %s already exists", filename)
+		} else if !os.IsNotExist(err) {
+			return fmt.Errorf("check %s: %w", filename, err)
 		}
 
 		formatted, err := renderTemplate(tmpl, data)
@@ -128,6 +131,11 @@ func Generate(opts Options) error {
 			return fmt.Errorf("render %s: %w", filename, err)
 		}
 
+		rendered[filename] = formatted
+	}
+
+	for filename, formatted := range rendered {
+		destPath := filepath.Join(outputDir, filename)
 		if err := os.WriteFile(destPath, formatted, 0o644); err != nil {
 			return fmt.Errorf("write %s: %w", filename, err)
 		}
@@ -966,7 +974,7 @@ func (h *{{ .Entity }}Controller) Delete(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusNoContent, response.JSON(nil, nil))
+		c.Status(http.StatusNoContent)
 }
 `
 

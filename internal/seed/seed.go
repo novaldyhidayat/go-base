@@ -2,6 +2,7 @@ package seed
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.uber.org/zap"
@@ -36,6 +37,8 @@ func Run(ctx context.Context, cfg *config.Config, db database.Database, cache ca
 	if _, err := service.FindByEmail(ctx, adminEmail); err == nil {
 		log.Info("admin user already exists", zap.String("email", adminEmail))
 		return nil
+	} else if !errors.Is(err, user.ErrNotFound) {
+		return fmt.Errorf("check admin user: %w", err)
 	}
 
 	hash, err := password.Hash(adminPassword)

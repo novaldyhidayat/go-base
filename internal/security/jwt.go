@@ -73,11 +73,11 @@ func (j *rsaJWTManager) Sign(subject string, scopes []string) (string, error) {
 
 func (j *rsaJWTManager) Verify(tokenStr string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+		if token.Method.Alg() != jwt.SigningMethodRS256.Alg() {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return j.publicKey, nil
-	})
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodRS256.Alg()}), jwt.WithIssuer(j.cfg.Issuer), jwt.WithAudience(j.cfg.Audience))
 	if err != nil {
 		return nil, err
 	}
@@ -96,16 +96,31 @@ func readPrivateKey(path string) (*rsa.PrivateKey, error) {
 	}
 
 	block, _ := pem.Decode(data)
-	if block == nil || block.Type != "RSA PRIVATE KEY" {
+	if block == nil {
 		return nil, errors.New("invalid private key format")
 	}
 
-	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
+	if block.Type == "RSA PRIVATE KEY" {
+		key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		return key, nil
 	}
 
-	return key, nil
+	if block.Type == "PRIVATE KEY" {
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		rsaKey, ok := key.(*rsa.PrivateKey)
+		if !ok {
+			return nil, errors.New("not an RSA private key")
+		}
+		return rsaKey, nil
+	}
+
+	return nil, errors.New("invalid private key format")
 }
 
 func readPublicKey(path string) (*rsa.PublicKey, error) {
@@ -115,19 +130,29 @@ func readPublicKey(path string) (*rsa.PublicKey, error) {
 	}
 
 	block, _ := pem.Decode(data)
-	if block == nil || block.Type != "PUBLIC KEY" {
+	if block == nil {
 		return nil, errors.New("invalid public key format")
 	}
 
-	key, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
+	if block.Type == "RSA PUBLIC KEY" {
+		key, err := x509.ParsePKCS1PublicKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		return key, nil
 	}
 
-	rsaKey, ok := key.(*rsa.PublicKey)
-	if !ok {
-		return nil, errors.New("not an RSA public key")
+	if block.Type == "PUBLIC KEY" {
+		key, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		rsaKey, ok := key.(*rsa.PublicKey)
+		if !ok {
+			return nil, errors.New("not an RSA public key")
+		}
+		return rsaKey, nil
 	}
 
-	return rsaKey, nil
+	return nil, errors.New("invalid public key format")
 }
